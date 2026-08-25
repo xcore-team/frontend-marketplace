@@ -278,12 +278,23 @@ function ManifestSection({ project }: { project: Project }) {
           <ManifestItemPicker onAdd={(item) => setDraftItems((cur) => (cur.some((c) => c.kind === item.kind && c.slug === item.slug) ? cur : [...cur, item]))} />
 
           <div className="input-wrap mt-3 mb-3">
-            <label className="input-label"><Tag size={11} style={{ marginRight: 4 }} />Tag de cette version</label>
-            <input className="input" value={tag} onChange={(e) => setTag(e.target.value)} placeholder="Ex: 1.2.0" />
+            <label className="input-label"><Tag size={11} style={{ marginRight: 4 }} />Tag de cette version *</label>
+            <input className="input" value={tag} onChange={(e) => setTag(e.target.value)} placeholder="Ex: 1.2.0" autoFocus />
+            {/* Seul champ qui bloque "Enregistrer" (voir le disabled du bouton
+                ci-dessous) — sans indice visuel ici, un bouton grisé sans
+                explication ressemblait à une panne plutôt qu'à un champ
+                requis pas encore rempli. draftItems peut rester vide : un
+                manifeste sans composant est accepté côté backend. */}
+            {!tag.trim() && <p className="text-xs text-faint mt-1">Requis — le bouton Enregistrer reste inactif tant qu'aucun tag n'est saisi.</p>}
           </div>
 
           <div className="flex gap-2">
-            <button className="btn btn-primary btn-sm" disabled={!tag.trim() || createMutation.isPending} onClick={() => createMutation.mutate()}>
+            <button
+              className="btn btn-primary btn-sm"
+              disabled={!tag.trim() || createMutation.isPending}
+              title={!tag.trim() ? 'Saisissez un tag ci-dessus pour activer ce bouton' : undefined}
+              onClick={() => createMutation.mutate()}
+            >
               {createMutation.isPending ? 'Enregistrement…' : 'Enregistrer'}
             </button>
             <button className="btn btn-ghost btn-sm" onClick={() => setEditing(false)}>Annuler</button>
